@@ -1,0 +1,56 @@
+{
+  "name": "wholetail",
+  "version": "1.0.0",
+  "description": "Complete B2B Procurement Platform - Connecting retailers, wholesalers, and financiers in Kenya",
+  "main": "test-complete-system.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd wholetail-backend && npm run dev",
+    "start:frontend": "cd wholetail-frontend && npm start",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd wholetail-frontend && npm run build",
+    "build:backend": "cd wholetail-backend && npm install",
+    "test": "npm run test:system",
+    "test:system": "node test-complete-system.js",
+    "test:frontend": "cd wholetail-frontend && npm test",
+    "test:backend": "cd wholetail-backend && npm test",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd wholetail-frontend && npm run lint",
+    "lint:backend": "cd wholetail-backend && npm run lint"
+  },
+  "keywords": [
+    "b2b",
+    "procurement",
+    "marketplace",
+    "kenya",
+    "agriculture",
+    "wholesale",
+    "retail",
+    "financing",
+    "logistics",
+    "payments",
+    "mpesa"
+  ],
+  "author": "Wholetail Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wholetail/wholetail-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wholetail/wholetail-platform/issues"
+  },
+  "homepage": "https://wholetail.com",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.10.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "name": "wholetail",
+  "builds": [
+    {
+      "src": "wholetail-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    },
+    {
+      "src": "wholetail-backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "wholetail-backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "wholetail-frontend/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "wholetail-backend/server.js": {
+      "maxDuration": 30
+    }
+  }
+} 
