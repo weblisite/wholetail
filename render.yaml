@@ -18,6 +18,8 @@ services:
       - key: FRONTEND_URL
         sync: false
     healthCheckPath: /api/health
+    autoDeploy: true
+    plan: free
 
   # Frontend Static Site
   - type: web
@@ -34,4 +36,6 @@ services:
       - key: REACT_APP_BACKEND_URL
         sync: false
       - key: REACT_APP_GOOGLE_MAPS_API_KEY
-        sync: false 
+        sync: false
+    autoDeploy: true
+    plan: free 
