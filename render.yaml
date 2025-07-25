@@ -1,0 +1,37 @@
+services:
+  # Backend API Service
+  - type: web
+    name: wholetail-backend
+    env: node
+    rootDir: wholetail-backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+    healthCheckPath: /api/health
+
+  # Frontend Static Site
+  - type: web
+    name: wholetail-frontend
+    env: static
+    rootDir: wholetail-frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_SUPABASE_URL
+        sync: false
+      - key: REACT_APP_SUPABASE_ANON_KEY
+        sync: false
+      - key: REACT_APP_BACKEND_URL
+        sync: false
+      - key: REACT_APP_GOOGLE_MAPS_API_KEY
+        sync: false 
