@@ -5,6 +5,17 @@
         "args": [
           "@browsermcp/mcp@latest"
         ]
+      },
+      "supabase": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase@latest",
+          "--project-ref=jtgsvwucbrvrjlrbnycn"
+        ],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "sbp_7e9c86ebfdf99515e2e6335aee93b1c41b835474"
+        }
       }
     }
   }

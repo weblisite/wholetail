@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
     } = req.query;
 
     // Check if using mock data
-    if (!process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('your-project')) {
+    if (!process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('placeholder')) {
       console.log('Using mock products data for development');
       
       let filteredProducts = [...mockProducts];
@@ -116,16 +116,9 @@ router.get('/', async (req, res) => {
 
     // Real Supabase implementation
     let query = supabase
-      .from('products')
-      .select(`
-        *,
-        users:seller_id (
-          name,
-          type,
-          location
-        )
-      `)
-      .eq('availability_status', 'available');
+      .from('product_listings')
+      .select('*')
+      .eq('is_active', true);
 
     // Apply search filter
     if (search) {
@@ -139,15 +132,15 @@ router.get('/', async (req, res) => {
 
     // Apply price range filter
     if (min_price) {
-      query = query.gte('price_per_unit', parseFloat(min_price));
+      query = query.gte('price', parseFloat(min_price));
     }
     if (max_price) {
-      query = query.lte('price_per_unit', parseFloat(max_price));
+      query = query.lte('price', parseFloat(max_price));
     }
 
     // Apply location filter
     if (location) {
-      query = query.contains('users.location', [location]);
+      query = query.ilike('supplier_address', `%${location}%`);
     }
 
     // Apply pagination
