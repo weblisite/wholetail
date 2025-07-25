@@ -2,7 +2,7 @@
   "name": "wholetail",
   "version": "1.0.0",
   "description": "Complete B2B Procurement Platform - Connecting retailers, wholesalers, and financiers in Kenya",
-  "main": "index.js",
+
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd wholetail-backend && npm run dev",
