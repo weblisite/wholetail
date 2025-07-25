@@ -40,4 +40,4 @@ services:
         sync: false
     autoDeploy: true
     plan: free
-    branch: main
+    branch: main 
