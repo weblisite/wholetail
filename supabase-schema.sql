@@ -5,7 +5,7 @@
 -- This will be managed through Supabase dashboard
 
 -- Create custom types
-CREATE TYPE user_type AS ENUM ('wholesaler', 'farmer', 'retailer', 'financier');
+CREATE TYPE user_type AS ENUM ('wholesaler', 'retailer');
 CREATE TYPE verification_status AS ENUM ('pending', 'verified', 'rejected');
 CREATE TYPE order_status AS ENUM ('placed', 'accepted', 'preparing', 'dispatched', 'delivered', 'cancelled');
 CREATE TYPE notification_type AS ENUM ('order', 'payment', 'financing', 'delivery');
@@ -23,7 +23,7 @@ CREATE TABLE users (
     address TEXT NOT NULL,
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
-    license_number VARCHAR(100), -- For wholesalers/farmers
+    license_number VARCHAR(100), -- For wholesalers
     id_number VARCHAR(50), -- For retailers
     verification_status verification_status DEFAULT 'pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

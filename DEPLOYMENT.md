@@ -27,7 +27,7 @@ This guide will help you deploy the Wholetail application on Render.
 
 3. **Environment Variables:**
    ```
-   NODE_ENV=production
+NODE_ENV=production
    SUPABASE_URL=https://jtgsvwucbrvrjlrbnycn.supabase.co
    SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0Z3N2d3VjYnJ2cmpscmJueWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzMTYwMzgsImV4cCI6MjA2Nzg5MjAzOH0.QE59rPjGeEr8_Lem5_K_WUtNlBYqpSaV2pWIMeoac_s
    SUPABASE_SERVICE_ROLE_KEY=sbp_7e9c86ebfdf99515e2e6335aee93b1c41b835474

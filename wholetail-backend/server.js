@@ -27,8 +27,8 @@ app.use(limiter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
+  res.json({ 
+    status: 'OK', 
     message: 'Wholetail API is running',
     timestamp: new Date().toISOString()
   });
