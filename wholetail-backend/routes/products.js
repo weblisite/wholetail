@@ -72,8 +72,8 @@ router.get('/', async (req, res) => {
       limit = 20 
     } = req.query;
 
-    // Check if using mock data
-    if (!process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('placeholder')) {
+    // Check if using mock data (temporarily enabled for demo)
+    if (true || !process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('placeholder')) {
       console.log('Using mock products data for development');
       
       let filteredProducts = [...mockProducts];
