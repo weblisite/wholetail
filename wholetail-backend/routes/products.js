@@ -117,8 +117,7 @@ router.get('/', async (req, res) => {
     // Real Supabase implementation
     let query = supabase
       .from('product_listings')
-      .select('*')
-      .eq('is_active', true);
+      .select('*');
 
     // Apply search filter
     if (search) {
