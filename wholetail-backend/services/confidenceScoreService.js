@@ -6,6 +6,33 @@ const moment = require('moment');
 // Mock retailer data for development
 const mockRetailers = [
   {
+    id: 'retailer-123',
+    name: 'Test Retailer Store',
+    location: 'Nairobi CBD',
+    business_age_months: 18,
+    registration_date: '2023-01-15',
+    total_orders: 284,
+    total_revenue: 4850000,
+    average_order_value: 17077,
+    payment_success_rate: 0.96,
+    return_rate: 0.04,
+    geographic_risk_score: 0.85,
+    category_diversity: 12,
+    seasonal_stability: 0.82,
+    growth_trend: 0.42, // 42% growth
+    last_order_days_ago: 2,
+    credit_history: {
+      previous_loans: 3,
+      defaults: 0,
+      on_time_payments: 0.94
+    },
+    social_metrics: {
+      customer_reviews: 4.8,
+      repeat_customer_rate: 0.75,
+      referral_rate: 0.18
+    }
+  },
+  {
     id: 'retailer-1',
     name: 'Mama Jane\'s Store',
     location: 'Nairobi CBD',

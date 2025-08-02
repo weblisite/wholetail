@@ -2,7 +2,6 @@
   "name": "wholetail",
   "version": "1.0.0",
   "description": "Complete B2B Procurement Platform - Connecting retailers, wholesalers, and financiers in Kenya",
-
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd wholetail-backend && npm run dev",
@@ -36,7 +35,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wholetail/wholetail-platform.git"
+    "url": "git+https://github.com/wholetail/wholetail-platform.git"
   },
   "bugs": {
     "url": "https://github.com/wholetail/wholetail-platform/issues"
@@ -47,9 +46,11 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
     "axios": "^1.10.0"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
-  }
+  },
+  "main": "index.js"
 }

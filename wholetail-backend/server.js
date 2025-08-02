@@ -49,6 +49,9 @@ const logisticsRoutes = require('./routes/logistics');
 const mappingRoutes = require('./routes/mapping');
 const advertisingRoutes = require('./routes/advertising');
 const whatsappRoutes = require('./routes/whatsapp');
+const analyticsRoutes = require('./routes/analytics');
+const recommendationsRoutes = require('./routes/recommendations');
+const inventoryRoutes = require('./routes/inventory');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -65,6 +68,9 @@ app.use('/api/logistics', logisticsRoutes);
 app.use('/api/mapping', mappingRoutes);
 app.use('/api/advertising', advertisingRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

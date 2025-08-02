@@ -1,14 +1,68 @@
 const express = require('express');
-const { supabase, supabaseAdmin } = require('../config/database');
+const { database, clerk } = require('../config/database');
+const { requireAuth } = require('../middleware/clerk-auth');
 const router = express.Router();
 
-// User registration
-router.post('/register', async (req, res) => {
+// Clerk webhook for user creation
+router.post('/webhook/user-created', async (req, res) => {
   try {
-    const { email, password, phone, name, address, type, whatsapp, license_number, id_number } = req.body;
+    // Verify the webhook (in production, verify the signature)
+    const userData = req.body.data;
+    
+    if (!userData) {
+      return res.status(400).json({ error: 'Invalid webhook data' });
+    }
+
+    // Extract user info from Clerk webhook
+    const {
+      id: clerkId,
+      email_addresses,
+      first_name,
+      last_name,
+      public_metadata = {}
+    } = userData;
+
+    const email = email_addresses?.[0]?.email_address;
+    const name = `${first_name || ''} ${last_name || ''}`.trim();
+
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Missing required user data' });
+    }
+
+    // Create user in database
+    const newUser = await database.createUser({
+      id: clerkId,
+      clerk_id: clerkId,
+      type: public_metadata.user_type || 'retailer',
+      name,
+      phone: public_metadata.phone || '',
+      email,
+      whatsapp: public_metadata.whatsapp || public_metadata.phone || '',
+      address: public_metadata.address || '',
+      license_number: public_metadata.license_number || null,
+      id_number: public_metadata.id_number || null
+    });
+
+    res.status(200).json({ message: 'User created successfully', user: newUser });
+
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update user profile (called after Clerk registration to add business info)
+router.post('/profile/complete', requireAuth, async (req, res) => {
+  try {
+    const { phone, address, type, whatsapp, license_number, id_number } = req.body;
+    const userId = req.auth?.userId; // Middleware should provide this
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
     // Validate required fields
-    if (!email || !password || !phone || !name || !address || !type) {
+    if (!phone || !address || !type) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -18,146 +72,54 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Invalid user type' });
     }
 
-    // Register user with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          phone,
-          user_type: type
-        }
-      }
+    // Update user profile in database
+    const updatedUser = await database.updateUser(userId, {
+      type,
+      phone,
+      address,
+      whatsapp: whatsapp || phone,
+      license_number: type === 'wholesaler' || type === 'farmer' ? license_number : null,
+      id_number: type === 'retailer' ? id_number : null
     });
 
-    if (authError) {
-      return res.status(400).json({ error: authError.message });
-    }
-
-    // Insert user details into users table
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from('users')
-      .insert({
-        id: authData.user.id,
-        type,
-        name,
+    // Update Clerk user metadata
+    await clerk.users.updateUser(userId, {
+      publicMetadata: {
+        user_type: type,
         phone,
-        email,
-        whatsapp: whatsapp || phone,
         address,
-        license_number: type === 'wholesaler' || type === 'farmer' ? license_number : null,
-        id_number: type === 'retailer' ? id_number : null,
-        verification_status: 'pending',
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (userError) {
-      // Clean up auth user if database insert fails
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-      return res.status(500).json({ error: 'Failed to create user profile' });
-    }
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        type: userData.type,
-        verification_status: userData.verification_status
+        whatsapp: whatsapp || phone,
+        license_number,
+        id_number,
+        profile_completed: true
       }
     });
 
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// User login
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      return res.status(401).json({ error: error.message });
-    }
-
-    // Get user profile
-    const { data: userProfile, error: profileError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
-
-    if (profileError) {
-      return res.status(500).json({ error: 'Failed to fetch user profile' });
-    }
-
-    res.json({
-      message: 'Login successful',
-      user: userProfile,
-      session: data.session
+    res.status(200).json({
+      message: 'Profile completed successfully',
+      user: updatedUser
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Profile completion error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Logout
-router.post('/logout', async (req, res) => {
+// Get current user (Clerk handles auth client-side, this just gets profile)
+router.get('/me', requireAuth, async (req, res) => {
   try {
-    const { error } = await supabase.auth.signOut();
+    const userId = req.auth?.userId; // Middleware should provide this from Clerk JWT
     
-    if (error) {
-      return res.status(400).json({ error: error.message });
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    res.json({ message: 'Logout successful' });
-  } catch (error) {
-    console.error('Logout error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+    // Get user profile from database
+    const userProfile = await database.getUserById(userId);
 
-// Get current user
-router.get('/me', async (req, res) => {
-  try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // Get user profile
-    const { data: userProfile, error: profileError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError) {
-      return res.status(500).json({ error: 'Failed to fetch user profile' });
+    if (!userProfile) {
+      return res.status(404).json({ error: 'User profile not found' });
     }
 
     res.json({ user: userProfile });
@@ -168,27 +130,59 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// Request password reset
-router.post('/reset-password', async (req, res) => {
+// Update user profile
+router.put('/profile', requireAuth, async (req, res) => {
   try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+    const userId = req.auth?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.FRONTEND_URL}/reset-password`
+    const updates = req.body;
+    
+    // Remove sensitive fields that shouldn't be updated directly
+    delete updates.id;
+    delete updates.clerk_id;
+    delete updates.created_at;
+    delete updates.updated_at;
+
+    const updatedUser = await database.updateUser(userId, updates);
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: updatedUser
     });
 
-    if (error) {
-      return res.status(400).json({ error: error.message });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete user account
+router.delete('/account', requireAuth, async (req, res) => {
+  try {
+    const userId = req.auth?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    res.json({ message: 'Password reset email sent' });
+    // Delete user from database
+    await database.deleteUser(userId);
+
+    // Delete user from Clerk
+    await clerk.users.deleteUser(userId);
+
+    res.json({ message: 'Account deleted successfully' });
 
   } catch (error) {
-    console.error('Password reset error:', error);
+    console.error('Account deletion error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

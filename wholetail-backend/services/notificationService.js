@@ -62,7 +62,8 @@ const mockNotifications = [
 function initializeServices() {
   try {
     // Initialize Twilio (for SMS only)
-    if (TWILIO_CONFIG.accountSid !== 'mock_account_sid') {
+    if (TWILIO_CONFIG.accountSid !== 'mock_account_sid' && 
+        TWILIO_CONFIG.accountSid !== 'placeholder') {
       twilioClient = twilio(TWILIO_CONFIG.accountSid, TWILIO_CONFIG.authToken);
       console.log('✅ Twilio SMS initialized');
     } else {
@@ -70,7 +71,8 @@ function initializeServices() {
     }
 
     // Initialize SendGrid
-    if (SENDGRID_CONFIG.apiKey !== 'mock_sendgrid_key') {
+    if (SENDGRID_CONFIG.apiKey !== 'mock_sendgrid_key' && 
+        SENDGRID_CONFIG.apiKey !== 'placeholder') {
       sgMail.setApiKey(SENDGRID_CONFIG.apiKey);
       sendGridInitialized = true;
       console.log('✅ SendGrid initialized');

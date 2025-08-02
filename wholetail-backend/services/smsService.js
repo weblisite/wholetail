@@ -21,7 +21,10 @@ class SMSService {
     const providers = {};
 
     // Twilio
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+    if (process.env.TWILIO_ACCOUNT_SID && 
+        process.env.TWILIO_AUTH_TOKEN &&
+        process.env.TWILIO_ACCOUNT_SID !== 'placeholder' &&
+        process.env.TWILIO_AUTH_TOKEN !== 'placeholder') {
       providers.twilio = {
         client: twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN),
         name: 'Twilio',
