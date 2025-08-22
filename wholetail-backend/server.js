@@ -52,6 +52,10 @@ const whatsappRoutes = require('./routes/whatsapp');
 const analyticsRoutes = require('./routes/analytics');
 const recommendationsRoutes = require('./routes/recommendations');
 const inventoryRoutes = require('./routes/inventory');
+const reviewsRoutes = require('./routes/reviews');
+const driversRoutes = require('./routes/drivers');
+const chatRoutes = require('./routes/chat');
+const preferencesRoutes = require('./routes/preferences');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -71,6 +75,10 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/drivers', driversRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/preferences', preferencesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

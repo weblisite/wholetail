@@ -75,7 +75,7 @@ router.post('/profile/complete', requireAuth, async (req, res) => {
     // Update user profile in database
     const updatedUser = await database.updateUser(userId, {
       type,
-      phone,
+          phone,
       address,
       whatsapp: whatsapp || phone,
       license_number: type === 'wholesaler' || type === 'farmer' ? license_number : null,
